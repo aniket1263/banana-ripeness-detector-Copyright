@@ -52,4 +52,5 @@ logs/
 htmlcov/
 
 # ── Docker ──
-.docker/
+.docker/*.zip 
+dataset/ 
