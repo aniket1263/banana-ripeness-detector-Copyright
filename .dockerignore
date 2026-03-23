@@ -1,0 +1,10 @@
+dataset/
+.git/
+.env
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+notebooks/
+tests/
+*.log
+venv/

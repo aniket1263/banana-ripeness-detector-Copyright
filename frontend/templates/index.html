@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0a0a08" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>BananaLens</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a08;
+        --surface: #141410;
+        --surface2: #1c1c17;
+        --border: #2c2c24;
+        --yellow: #f0c419;
+        --yellow-dim: rgba(240, 196, 25, 0.1);
+        --green: #6fcf5a;
+        --orange: #f5923a;
+        --red: #f06060;
+        --text: #f0ece0;
+        --muted: #5a5a4a;
+        --muted2: #888870;
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html,
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        min-height: 100vh;
+        min-height: 100dvh;
+        overflow-x: hidden;
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(240, 196, 25, 0.025) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(240, 196, 25, 0.025) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+        z-index: 0;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        top: -30%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(
+          circle,
+          rgba(240, 196, 25, 0.07) 0%,
+          transparent 65%
+        );
+        pointer-events: none;
+        z-index: 0;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+        background: rgba(10, 10, 8, 0.85);
+        backdrop-filter: blur(16px);
+      }
+      .logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 1.2rem;
+        letter-spacing: -0.04em;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .logo-icon {
+        width: 30px;
+        height: 30px;
+        background: var(--yellow);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+      }
+      .logo span {
+        color: var(--yellow);
+      }
+      .api-status {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.62rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted2);
+      }
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--muted);
+        transition: background 0.3s;
+      }
+      .dot.online {
+        background: var(--green);
+        box-shadow: 0 0 6px var(--green);
+      }
+      .dot.offline {
+        background: var(--red);
+      }
+
+      main {
+        position: relative;
+        z-index: 10;
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 2rem 1.2rem calc(2rem + var(--safe-bottom));
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      /* Hero */
+      .hero {
+        text-align: center;
+        animation: fadeUp 0.6s ease both;
+      }
+      .hero-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.6rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--yellow);
+        border: 1px solid rgba(240, 196, 25, 0.25);
+        padding: 0.25rem 0.8rem;
+        border-radius: 20px;
+        background: var(--yellow-dim);
+        margin-bottom: 1rem;
+      }
+      .hero h1 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(2rem, 9vw, 3rem);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.05em;
+        margin-bottom: 0.7rem;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--yellow);
+        display: block;
+      }
+      .hero p {
+        color: var(--muted2);
+        font-size: 0.72rem;
+        letter-spacing: 0.03em;
+        line-height: 1.7;
+      }
+
+      /* Input method buttons */
+      .input-methods {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+        animation: fadeUp 0.6s 0.1s ease both;
+      }
+      .method-btn {
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 14px;
+        padding: 1.3rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        position: relative;
+        overflow: hidden;
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      .method-btn::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: var(--yellow-dim);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .method-btn:hover::before,
+      .method-btn:active::before {
+        opacity: 1;
+      }
+      .method-btn:hover {
+        border-color: var(--yellow);
+        transform: translateY(-2px);
+      }
+      .method-btn:active {
+        transform: scale(0.97);
+      }
+      .method-icon {
+        font-size: 1.8rem;
+      }
+      .method-label {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+      .method-sub {
+        font-size: 0.6rem;
+        color: var(--muted2);
+        letter-spacing: 0.04em;
+      }
+
+      /* Camera */
+      .camera-section {
+        display: none;
+        flex-direction: column;
+        gap: 0.8rem;
+        animation: fadeUp 0.4s ease both;
+      }
+      .camera-section.active {
+        display: flex;
+      }
+      .camera-wrap {
+        position: relative;
+        background: #000;
+        border-radius: 16px;
+        overflow: hidden;
+        aspect-ratio: 4/3;
+        border: 1px solid var(--border);
+      }
+      #cameraFeed {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .camera-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+      }
+      .scan-frame {
+        width: 55%;
+        aspect-ratio: 1;
+        border: 2px solid rgba(240, 196, 25, 0.6);
+        border-radius: 12px;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.35);
+        position: relative;
+      }
+      .scan-frame::before,
+      .scan-frame::after,
+      .scn-br,
+      .scn-bl {
+        content: "";
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border-color: var(--yellow);
+        border-style: solid;
+      }
+      .scan-frame::before {
+        top: -2px;
+        left: -2px;
+        border-width: 3px 0 0 3px;
+        border-radius: 4px 0 0 0;
+      }
+      .scan-frame::after {
+        top: -2px;
+        right: -2px;
+        border-width: 3px 3px 0 0;
+        border-radius: 0 4px 0 0;
+      }
+      .scn-br {
+        bottom: -2px;
+        right: -2px;
+        border-width: 0 3px 3px 0;
+        border-radius: 0 0 4px 0;
+      }
+      .scn-bl {
+        bottom: -2px;
+        left: -2px;
+        border-width: 0 0 3px 3px;
+        border-radius: 0 0 0 4px;
+      }
+      .scan-line {
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--yellow),
+          transparent
+        );
+        animation: scanMove 2s ease-in-out infinite;
+        border-radius: 1px;
+      }
+      .camera-controls {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+      }
+      .capture-btn {
+        flex: 1;
+        padding: 1rem;
+        background: var(--yellow);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        touch-action: manipulation;
+      }
+      .capture-btn:active {
+        transform: scale(0.96);
+      }
+      .close-cam-btn {
+        padding: 1rem 1.2rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        color: var(--muted2);
+        font-size: 0.8rem;
+        cursor: pointer;
+        font-family: "DM Mono", monospace;
+        touch-action: manipulation;
+        transition: all 0.2s;
+      }
+      .close-cam-btn:hover {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .flip-btn {
+        padding: 1rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        color: var(--text);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        touch-action: manipulation;
+      }
+      .flip-btn:active {
+        transform: rotate(180deg);
+      }
+
+      /* Preview */
+      .preview-section {
+        display: none;
+        flex-direction: column;
+        gap: 0.8rem;
+        animation: fadeUp 0.4s ease both;
+      }
+      .preview-section.active {
+        display: flex;
+      }
+      .preview-wrap {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        aspect-ratio: 4/3;
+        background: #000;
+      }
+      #previewImg {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .preview-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+      }
+      .retake-btn {
+        padding: 0.9rem;
+        background: var(--surface);
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        color: var(--muted2);
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        touch-action: manipulation;
+      }
+      .retake-btn:hover {
+        border-color: var(--muted2);
+        color: var(--text);
+      }
+      .analyze-btn {
+        padding: 0.9rem;
+        background: var(--yellow);
+        color: #000;
+        border: none;
+        border-radius: 12px;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        touch-action: manipulation;
+      }
+      .analyze-btn:active {
+        transform: scale(0.97);
+      }
+      .analyze-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .spinner {
+        width: 14px;
+        height: 14px;
+        border: 2px solid #000;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: none;
+      }
+      .analyze-btn.loading .spinner {
+        display: block;
+      }
+      .analyze-btn.loading .btn-text {
+        display: none;
+      }
+
+      /* Results */
+      .result-card {
+        display: none;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        animation: fadeUp 0.5s ease both;
+      }
+      .result-card.visible {
+        display: block;
+      }
+      .result-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .result-label {
+        font-family: "Syne", sans-serif;
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        line-height: 1;
+      }
+      .result-right {
+        text-align: right;
+      }
+      .result-emoji {
+        font-size: 2.2rem;
+      }
+      .result-conf {
+        font-size: 0.65rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--muted2);
+        margin-top: 0.2rem;
+      }
+      .stage-track {
+        display: flex;
+        gap: 3px;
+        margin-top: 0.8rem;
+      }
+      .stage-seg {
+        flex: 1;
+        height: 3px;
+        border-radius: 2px;
+        background: var(--border);
+        transition: background 0.5s ease;
+      }
+      .result-body {
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+      }
+      .bars-label {
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 0.8rem;
+      }
+      .bars {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+      .bar-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+      .bar-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.68rem;
+      }
+      .bar-name {
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted2);
+      }
+      .bar-track {
+        height: 5px;
+        background: var(--border);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .bar-fill {
+        height: 100%;
+        border-radius: 3px;
+        width: 0%;
+        transition: width 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      .tip-box {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 0.9rem 1rem;
+        font-size: 0.7rem;
+        color: var(--muted2);
+        line-height: 1.6;
+      }
+      .tip-box strong {
+        color: var(--text);
+      }
+
+      /* Stage guide */
+      .stage-guide {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        animation: fadeUp 0.6s 0.2s ease both;
+      }
+      .stage-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+      }
+      .stage-card:active {
+        transform: scale(0.97);
+      }
+      .stage-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .stage-card.s1::before {
+        background: var(--green);
+      }
+      .stage-card.s2::before {
+        background: var(--yellow);
+      }
+      .stage-card.s3::before {
+        background: var(--orange);
+      }
+      .stage-card.s4::before {
+        background: var(--red);
+      }
+      .stage-card .emoji {
+        font-size: 1.4rem;
+        display: block;
+        margin-bottom: 0.4rem;
+      }
+      .stage-card .name {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 0.8rem;
+        margin-bottom: 0.2rem;
+      }
+      .stage-card .desc {
+        font-size: 0.6rem;
+        color: var(--muted2);
+        line-height: 1.5;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: calc(1.5rem + var(--safe-bottom));
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 30px;
+        padding: 0.65rem 1.2rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.04em;
+        backdrop-filter: blur(12px);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 200;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+      .toast-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+
+      #fileInput,
+      #captureInput {
+        display: none;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes scanMove {
+        0% {
+          top: 8px;
+        }
+        50% {
+          top: calc(100% - 10px);
+        }
+        100% {
+          top: 8px;
+        }
+      }
+
+      @media (min-width: 600px) {
+        main {
+          padding: 2.5rem 2rem;
+        }
+        .stage-guide {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .hero h1 {
+          font-size: 3.2rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <div class="logo-icon">🍌</div>
+        <div>Banana<span>Lens</span></div>
+      </div>
+      <div class="api-status">
+        <div class="dot" id="apiDot"></div>
+        <span id="apiLabel">checking</span>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div class="hero-tag">⚡ MobileNetV2 · Live Inference</div>
+        <h1>Detect<em>Ripeness</em></h1>
+        <p>
+          Snap or upload a banana photo — our ML model classifies ripeness
+          instantly.
+        </p>
+      </div>
+
+      <div class="input-methods" id="inputMethods">
+        <div class="method-btn" id="cameraBtn">
+          <div class="method-icon">📷</div>
+          <div class="method-label">Camera</div>
+          <div class="method-sub">Take live photo</div>
+        </div>
+        <div class="method-btn" id="uploadBtn">
+          <div class="method-icon">📁</div>
+          <div class="method-label">Upload</div>
+          <div class="method-sub">Choose from gallery</div>
+        </div>
+      </div>
+
+      <!-- Camera (desktop) -->
+      <div class="camera-section" id="cameraSection">
+        <div class="camera-wrap">
+          <video id="cameraFeed" autoplay playsinline muted></video>
+          <div class="camera-overlay">
+            <div class="scan-frame">
+              <div class="scn-br"></div>
+              <div class="scn-bl"></div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+        </div>
+        <div class="camera-controls">
+          <button class="close-cam-btn" id="closeCamBtn">✕</button>
+          <button class="flip-btn" id="flipBtn">🔄</button>
+          <button class="capture-btn" id="captureBtn">📸 Capture</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="preview-section" id="previewSection">
+        <div class="preview-wrap">
+          <img id="previewImg" src="" alt="Preview" />
+        </div>
+        <div class="preview-actions">
+          <button class="retake-btn" id="retakeBtn">↩ Retake</button>
+          <button class="analyze-btn" id="analyzeBtn">
+            <div class="spinner"></div>
+            <span class="btn-text">⚡ Analyze</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-card" id="resultCard">
+        <div class="result-header">
+          <div>
+            <div class="result-label" id="resultLabel">—</div>
+            <div class="stage-track">
+              <div class="stage-seg" id="seg1"></div>
+              <div class="stage-seg" id="seg2"></div>
+              <div class="stage-seg" id="seg3"></div>
+              <div class="stage-seg" id="seg4"></div>
+            </div>
+          </div>
+          <div class="result-right">
+            <div class="result-emoji" id="resultEmoji">🍌</div>
+            <div class="result-conf" id="resultConf">—</div>
+          </div>
+        </div>
+        <div class="result-body">
+          <div>
+            <div class="bars-label">Confidence Breakdown</div>
+            <div class="bars" id="barsContainer"></div>
+          </div>
+          <div class="tip-box" id="tipBox"></div>
+        </div>
+      </div>
+
+      <!-- Stage guide -->
+      <div class="stage-guide">
+        <div class="stage-card s1">
+          <span class="emoji">🟢</span>
+          <div class="name" style="color: #6fcf5a">Unripe</div>
+          <div class="desc">Firm & starchy. Best for cooking.</div>
+        </div>
+        <div class="stage-card s2">
+          <span class="emoji">🟡</span>
+          <div class="name" style="color: #f0c419">Ripe</div>
+          <div class="desc">Sweet & soft. Perfect to eat now.</div>
+        </div>
+        <div class="stage-card s3">
+          <span class="emoji">🟠</span>
+          <div class="name" style="color: #f5923a">Overripe</div>
+          <div class="desc">Very sweet. Great for smoothies.</div>
+        </div>
+        <div class="stage-card s4">
+          <span class="emoji">🔴</span>
+          <div class="name" style="color: #f06060">Rotten</div>
+          <div class="desc">Discard or compost it.</div>
+        </div>
+      </div>
+    </main>
+
+    <input type="file" id="fileInput" accept="image/*" />
+    <input
+      type="file"
+      id="captureInput"
+      accept="image/*"
+      capture="environment"
+    />
+    <canvas id="captureCanvas" style="display: none"></canvas>
+
+    <div class="toast" id="toast">
+      <div class="toast-dot" id="toastDot"></div>
+      <span id="toastMsg">—</span>
+    </div>
+
+    <script>
+      const API_URL = "/predict";
+      const COLORS = {
+        overripe: "#f5923a",
+        ripe: "#f0c419",
+        rotten: "#f06060",
+        unripe: "#6fcf5a",
+      };
+      const EMOJIS = { overripe: "🟠", ripe: "🟡", rotten: "🔴", unripe: "🟢" };
+      const STAGE_IDX = { unripe: 1, ripe: 2, overripe: 3, rotten: 4 };
+      const SEG_COL = {
+        unripe: "#6fcf5a",
+        ripe: "#f0c419",
+        overripe: "#f5923a",
+        rotten: "#f06060",
+      };
+      const TIPS = {
+        unripe:
+          "💡 <strong>Tip:</strong> Leave at room temperature 2–3 days to ripen naturally.",
+        ripe: "💡 <strong>Tip:</strong> Refrigerate to extend freshness by 4–5 days.",
+        overripe:
+          "💡 <strong>Tip:</strong> Mash & freeze for banana bread or smoothies.",
+        rotten:
+          "💡 <strong>Tip:</strong> Compost it — great potassium boost for plants!",
+      };
+
+      let selectedFile = null;
+      let stream = null;
+      let facingMode = "environment";
+      const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+      // Camera button
+      document
+        .getElementById("cameraBtn")
+        .addEventListener("click", async () => {
+          if (isMobile) {
+            // On mobile — use native camera input (opens camera app directly)
+            document.getElementById("captureInput").click();
+          } else {
+            // On desktop — use browser getUserMedia
+            await startDesktopCamera();
+          }
+        });
+
+      // Mobile native capture
+      document
+        .getElementById("captureInput")
+        .addEventListener("change", (e) => {
+          const file = e.target.files[0];
+          if (file) showPreview(file);
+          e.target.value = "";
+        });
+
+      // Upload button
+      document.getElementById("uploadBtn").addEventListener("click", () => {
+        document.getElementById("fileInput").click();
+      });
+
+      document.getElementById("fileInput").addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) showPreview(file);
+        e.target.value = "";
+      });
+
+      // Desktop camera
+      async function startDesktopCamera() {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              facingMode,
+              width: { ideal: 1280 },
+              height: { ideal: 960 },
+            },
+          });
+          document.getElementById("cameraFeed").srcObject = stream;
+          document.getElementById("inputMethods").style.display = "none";
+          document.getElementById("cameraSection").classList.add("active");
+          document.getElementById("resultCard").classList.remove("visible");
+        } catch {
+          showToast("❌ Camera not accessible", true);
+        }
+      }
+
+      function stopCamera() {
+        if (stream) {
+          stream.getTracks().forEach((t) => t.stop());
+          stream = null;
+        }
+        document.getElementById("cameraSection").classList.remove("active");
+        document.getElementById("inputMethods").style.display = "grid";
+      }
+
+      document
+        .getElementById("closeCamBtn")
+        .addEventListener("click", stopCamera);
+
+      document.getElementById("flipBtn").addEventListener("click", async () => {
+        facingMode = facingMode === "environment" ? "user" : "environment";
+        if (stream) {
+          stopCamera();
+          await startDesktopCamera();
+        }
+      });
+
+      document.getElementById("captureBtn").addEventListener("click", () => {
+        const video = document.getElementById("cameraFeed");
+        const canvas = document.getElementById("captureCanvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        canvas.toBlob(
+          (blob) => {
+            const file = new File([blob], "capture.jpg", {
+              type: "image/jpeg",
+            });
+            stopCamera();
+            showPreview(file);
+          },
+          "image/jpeg",
+          0.92,
+        );
+      });
+
+      // Show preview
+      function showPreview(file) {
+        selectedFile = file;
+        document.getElementById("previewImg").src = URL.createObjectURL(file);
+        document.getElementById("previewSection").classList.add("active");
+        document.getElementById("inputMethods").style.display = "none";
+        document.getElementById("resultCard").classList.remove("visible");
+        resetResult();
+      }
+
+      document.getElementById("retakeBtn").addEventListener("click", () => {
+        document.getElementById("previewSection").classList.remove("active");
+        document.getElementById("inputMethods").style.display = "grid";
+        selectedFile = null;
+        document.getElementById("resultCard").classList.remove("visible");
+      });
+
+      // Analyze
+      document
+        .getElementById("analyzeBtn")
+        .addEventListener("click", async () => {
+          if (!selectedFile) return;
+          const btn = document.getElementById("analyzeBtn");
+          btn.classList.add("loading");
+          btn.disabled = true;
+          try {
+            const fd = new FormData();
+            fd.append("file", selectedFile);
+            const res = await fetch(API_URL, { method: "POST", body: fd });
+            if (!res.ok) throw new Error(res.status);
+            const data = await res.json();
+            displayResults(data);
+            showToast("✅ Prediction complete", false);
+          } catch {
+            showToast("❌ API offline — run app.py first", true);
+          } finally {
+            btn.classList.remove("loading");
+            btn.disabled = false;
+          }
+        });
+
+      function displayResults(data) {
+        const label = data.label;
+        const color = COLORS[label] || "#f0c419";
+        const card = document.getElementById("resultCard");
+
+        card.classList.add("visible");
+        document.getElementById("resultLabel").textContent =
+          label.charAt(0).toUpperCase() + label.slice(1);
+        document.getElementById("resultLabel").style.color = color;
+        document.getElementById("resultEmoji").textContent =
+          EMOJIS[label] || "🍌";
+        document.getElementById("resultConf").textContent =
+          `${data.confidence.toFixed(1)}% confidence`;
+
+        resetSegs();
+        const n = STAGE_IDX[label];
+        for (let i = 1; i <= n; i++) {
+          document.getElementById(`seg${i}`).style.background = SEG_COL[label];
+        }
+
+        const container = document.getElementById("barsContainer");
+        container.innerHTML = "";
+        ["unripe", "ripe", "overripe", "rotten"].forEach((cls, i) => {
+          const pct = (data.scores[cls] || 0).toFixed(1);
+          const row = document.createElement("div");
+          row.className = "bar-row";
+          row.innerHTML = `
+        <div class="bar-meta">
+          <span class="bar-name">${cls}</span>
+          <span class="bar-pct" style="color:${COLORS[cls]}">${pct}%</span>
+        </div>
+        <div class="bar-track">
+          <div class="bar-fill" id="bf-${cls}" style="background:${COLORS[cls]}"></div>
+        </div>`;
+          container.appendChild(row);
+          setTimeout(
+            () => {
+              document.getElementById(`bf-${cls}`).style.width = pct + "%";
+            },
+            60 + i * 80,
+          );
+        });
+
+        document.getElementById("tipBox").innerHTML = TIPS[label] || "";
+        setTimeout(
+          () => card.scrollIntoView({ behavior: "smooth", block: "nearest" }),
+          200,
+        );
+      }
+
+      function resetResult() {
+        document.getElementById("resultLabel").textContent = "—";
+        document.getElementById("resultConf").textContent = "—";
+        document.getElementById("resultEmoji").textContent = "🍌";
+        document.getElementById("barsContainer").innerHTML = "";
+        document.getElementById("tipBox").innerHTML = "";
+        resetSegs();
+      }
+
+      function resetSegs() {
+        for (let i = 1; i <= 4; i++) {
+          document.getElementById(`seg${i}`).style.background = "var(--border)";
+        }
+      }
+
+      function showToast(msg, isError) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toastMsg").textContent = msg;
+        document.getElementById("toastDot").style.background = isError
+          ? "var(--red)"
+          : "var(--green)";
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 3200);
+      }
+
+      // API health check on load
+      window.addEventListener("load", async () => {
+        const dot = document.getElementById("apiDot");
+        const lbl = document.getElementById("apiLabel");
+        try {
+          const res = await fetch("/health", {
+            signal: AbortSignal.timeout(3000),
+          });
+          if (res.ok) {
+            dot.className = "dot online";
+            lbl.textContent = "API online";
+            showToast("🍌 API Connected", false);
+          }
+        } catch {
+          dot.className = "dot offline";
+          lbl.textContent = "API offline";
+        }
+      });
+    </script>
+  </body>
+</html>
