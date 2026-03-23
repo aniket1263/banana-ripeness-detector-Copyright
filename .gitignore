@@ -1,0 +1,55 @@
+# ── Model files (too large for git) ──
+model/saved/
+model/checkpoints/
+*.h5
+*.keras
+*.tflite
+
+# ── Dataset (too large for git) ──
+dataset/
+*.zip
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ── Jupyter Notebooks ──
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# ── Environment ──
+venv/
+env/
+.env
+.env.local
+*.env
+
+# ── VS Code ──
+.vscode/
+*.code-workspace
+
+# ── Kaggle API Key (never commit this!) ──
+kaggle.json
+
+# ── OS files ──
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ──
+*.log
+logs/
+
+# ── Test cache ──
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Docker ──
+.docker/
