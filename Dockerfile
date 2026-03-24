@@ -1,11 +1,11 @@
-FROM tensorflow/tensorflow:2.13.0
+FROM python:3.10-slim
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir flask flask-cors pillow numpy matplotlib gunicorn
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir flask flask-cors pillow numpy matplotlib gunicorn tensorflow-cpu
 
 COPY . .
 
