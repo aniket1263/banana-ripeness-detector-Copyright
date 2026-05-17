@@ -1,3 +1,10 @@
+This is copyright project of our team.
+Aniket Arora(2210991263)
+Alok Ranjan(22210991242)
+Sudeep Rohaj(2210992412)
+
+Copyright-Diary-No.=>
+
 # 🍌 Banana Ripeness Detector
 
 An end-to-end Machine Learning web app that classifies banana ripeness
