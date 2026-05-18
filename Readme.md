@@ -3,7 +3,7 @@ Aniket Arora(2210991263)
 Alok Ranjan(22210991242)
 Sudeep Rohaj(2210992412)
 
-Copyright-Diary-No.=>
+Copyright-Diary-No.=>SW-23476/2026-CO
 
 # 🍌 Banana Ripeness Detector
 
